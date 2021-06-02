@@ -37,16 +37,14 @@ class MainActivity : AppCompatActivity() {
     fun updateData(){
 
 
-        val rf = Retrofit.Builder()
-            .baseUrl("https://jsonplaceholder.typicode.com/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(InterfaceJson::class.java)
+//        val rf = Retrofit.Builder()
+//            .baseUrl("https://jsonplaceholder.typicode.com/")
+//            .addConverterFactory(GsonConverterFactory.create())
+//            .build()
+//            .create(InterfaceJson::class.java)
 
 
-
-
-        rf.getPosts().enqueue(object : Callback<List<Post>?> {
+        App.instance.rf.getPosts().enqueue(object : Callback<List<Post>?> {
             override fun onFailure(call: Call<List<Post>?>, t: Throwable) {
                 TODO("Not yet implemented")
             }

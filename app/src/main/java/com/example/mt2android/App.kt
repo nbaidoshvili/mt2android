@@ -12,14 +12,17 @@ class App: Application(){
     lateinit var db: AppDatabase
     lateinit var rf: InterfaceJson
 
+
     companion object{
         lateinit var instance:App
             private set
+
     }
 
 
     override fun onCreate() {
         super.onCreate()
+
 
 
         rf = Retrofit.Builder()
@@ -35,8 +38,8 @@ class App: Application(){
             "APP_DATABASE"
         ).allowMainThreadQueries().build()
 
-
         instance = this
+
     }
 
 }
