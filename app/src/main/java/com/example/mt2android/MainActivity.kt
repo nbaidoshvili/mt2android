@@ -29,6 +29,7 @@ class MainActivity : AppCompatActivity() {
         recycler.layoutManager = LinearLayoutManager(this)
         numberOfPosts = findViewById(R.id.postsNumber)
         refresh = findViewById(R.id.refreshPosts)
+        refresh.isRefreshing = true
 
 
         GlobalScope.launch(Dispatchers.IO) {
@@ -103,10 +104,12 @@ class MainActivity : AppCompatActivity() {
                     adapter.notifyDataSetChanged()
                     recycler.adapter = adapter
                     numberOfPosts.text = list.size.toString()
+                    refresh.isRefreshing = false
                 }
             }catch (e: Exception){
                 withContext(Dispatchers.Main){
                     Toast.makeText(applicationContext, "Something went wrong", Toast.LENGTH_SHORT).show()
+                    refresh.isRefreshing = false
                 }
             }
         }

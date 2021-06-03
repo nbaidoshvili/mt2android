@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.mt2android.adapters.CommentsRecyclerAdapter
-import com.example.mt2android.adapters.PostsRecyclerAdapter
 import com.example.mt2android.api.Post
 import kotlinx.coroutines.*
 import retrofit2.awaitResponse
@@ -34,6 +33,7 @@ class CommentsActivity : AppCompatActivity() {
         recycler.layoutManager = LinearLayoutManager(this)
         numberOfComments = findViewById(R.id.commentsNumber)
         refresh = findViewById(R.id.refreshComments)
+        refresh.isRefreshing = true
 
 
         postTitle.text = post?.title
