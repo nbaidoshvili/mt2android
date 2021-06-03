@@ -2,12 +2,13 @@ package com.example.mt2android
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.example.mt2android.adapters.PostConverter
+import com.example.mt2android.adapters.PostsRecyclerAdapter
 import kotlinx.coroutines.*
 import retrofit2.*
 import java.lang.Exception
@@ -16,7 +17,7 @@ import java.lang.Exception
 class MainActivity : AppCompatActivity() {
 
     private lateinit var recycler : RecyclerView
-    private lateinit var adapter : RecyclerViewAdapter
+    private lateinit var adapter : PostsRecyclerAdapter
     private lateinit var numberOfPosts: TextView
     private lateinit var refresh: SwipeRefreshLayout
 
@@ -59,7 +60,7 @@ class MainActivity : AppCompatActivity() {
                     val job1 = launch {
                         App.instance.db.getPostDao().deleteAllPosts()
 
-                        for (post in list) {
+                        for (post in PostConverter.toDB(list)) {
                             App.instance.db.getPostDao().insert(post)
                         }
                     }
@@ -67,7 +68,7 @@ class MainActivity : AppCompatActivity() {
 
                     val job2 = launch {
                         withContext(Dispatchers.Main) {
-                            adapter = RecyclerViewAdapter(list)
+                            adapter = PostsRecyclerAdapter(list, this@MainActivity)
                             adapter.notifyDataSetChanged()
                             recycler.adapter = adapter
                             numberOfPosts.text = list.size.toString()
@@ -95,10 +96,10 @@ class MainActivity : AppCompatActivity() {
         GlobalScope.launch(Dispatchers.IO) {
 
             try {
-                val list = App.instance.db.getPostDao().getAllPosts()
+                val list = PostConverter.fromDB(App.instance.db.getPostDao().getAllPosts())
 
                 withContext(Dispatchers.Main) {
-                    adapter = RecyclerViewAdapter(list)
+                    adapter = PostsRecyclerAdapter(list, this@MainActivity)
                     adapter.notifyDataSetChanged()
                     recycler.adapter = adapter
                     numberOfPosts.text = list.size.toString()

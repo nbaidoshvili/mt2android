@@ -4,17 +4,16 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.mt2android.Post
 
 @Dao
 interface PostDao{
 
     @Query("SELECT * FROM POSTS")
-    fun getAllPosts():List<Post>
+    fun getAllPosts():List<PostEntity>
 
     @Query("DELETE FROM POSTS")
     fun deleteAllPosts()
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(vararg post: Post)
+    fun insert(vararg post: PostEntity)
 }
