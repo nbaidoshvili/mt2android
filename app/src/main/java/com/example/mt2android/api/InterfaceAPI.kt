@@ -4,7 +4,7 @@ import com.example.mt2android.Post
 import retrofit2.Call
 import retrofit2.http.GET
 
-interface InterfaceJson {
+interface InterfaceAPI {
 
     @GET("posts")
     fun getPosts(): Call<List<Post>>

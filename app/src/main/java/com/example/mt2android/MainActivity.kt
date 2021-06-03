@@ -3,63 +3,113 @@ package com.example.mt2android
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.mt2android.api.InterfaceJson
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import kotlinx.coroutines.*
+import retrofit2.*
+import java.lang.Exception
+
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var recycler : RecyclerView
     private lateinit var adapter : RecyclerViewAdapter
+    private lateinit var numberOfPosts: TextView
+    private lateinit var refresh: SwipeRefreshLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
         recycler = findViewById(R.id.recyclerPosts)
-        //adapter = RecyclerViewAdapter(listOf())
-
-
-        //recycler.adapter = adapter
         recycler.layoutManager = LinearLayoutManager(this)
+        numberOfPosts = findViewById(R.id.postsNumber)
+        refresh = findViewById(R.id.refreshPosts)
 
 
-        updateData()
+        GlobalScope.launch(Dispatchers.IO) {
+            if(App.instance.db.getPostDao().getAllPosts().isEmpty()){
+
+                getDataAPI()
+            }
+            else{
+
+                getDataDB()
+            }
+        }
+
+        refresh.setOnRefreshListener {
+            getDataAPI()
+        }
     }
 
 
-    fun updateData(){
+    fun getDataAPI(){
+        GlobalScope.launch(Dispatchers.IO) {
+
+            try {
+                val response = App.instance.api.getPosts().awaitResponse()
+
+                if (response.isSuccessful) {
+                    val list = response.body()!!
+
+                    val job1 = launch {
+                        App.instance.db.getPostDao().deleteAllPosts()
+
+                        for (post in list) {
+                            App.instance.db.getPostDao().insert(post)
+                        }
+                    }
 
 
-//        val rf = Retrofit.Builder()
-//            .baseUrl("https://jsonplaceholder.typicode.com/")
-//            .addConverterFactory(GsonConverterFactory.create())
-//            .build()
-//            .create(InterfaceJson::class.java)
+                    val job2 = launch {
+                        withContext(Dispatchers.Main) {
+                            adapter = RecyclerViewAdapter(list)
+                            adapter.notifyDataSetChanged()
+                            recycler.adapter = adapter
+                            numberOfPosts.text = list.size.toString()
+                        }
+                    }
 
+                    job1.join()
+                    job2.join()
 
-        App.instance.rf.getPosts().enqueue(object : Callback<List<Post>?> {
-            override fun onFailure(call: Call<List<Post>?>, t: Throwable) {
-                TODO("Not yet implemented")
+                    withContext(Dispatchers.Main) {
+                        refresh.isRefreshing = false
+                    }
+                }
+            }catch (e: Exception){
+                withContext(Dispatchers.Main){
+                    Toast.makeText(applicationContext, "Something went wrong", Toast.LENGTH_SHORT).show()
+                    refresh.isRefreshing = false
+                }
             }
+        }
+    }
 
-            override fun onResponse(
-                call: Call<List<Post>?>,
-                response: Response<List<Post>?>
-            ) {
-                Log.e("succ", response.body()!![0].body)
-                adapter = RecyclerViewAdapter(response.body()!!)
-                adapter.notifyDataSetChanged()
-                recycler.adapter = adapter
+    fun getDataDB(){
+
+        GlobalScope.launch(Dispatchers.IO) {
+
+            try {
+                val list = App.instance.db.getPostDao().getAllPosts()
+
+                withContext(Dispatchers.Main) {
+                    adapter = RecyclerViewAdapter(list)
+                    adapter.notifyDataSetChanged()
+                    recycler.adapter = adapter
+                    numberOfPosts.text = list.size.toString()
+                }
+            }catch (e: Exception){
+                withContext(Dispatchers.Main){
+                    Toast.makeText(applicationContext, "Something went wrong", Toast.LENGTH_SHORT).show()
+                }
             }
-        })
-
+        }
 
     }
+
 }
