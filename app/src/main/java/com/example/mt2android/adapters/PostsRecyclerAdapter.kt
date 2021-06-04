@@ -16,7 +16,7 @@ import com.example.mt2android.R
 class PostsRecyclerAdapter (private val list: List<Post>, private val c : Context): RecyclerView.Adapter<PostsRecyclerAdapter.RecyclerViewHolder>() {
 
 
-    class RecyclerViewHolder(item: View) : RecyclerView.ViewHolder(item) {
+    class RecyclerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         val title: TextView = itemView.findViewById(R.id.postTitle)
         val body: TextView = itemView.findViewById(R.id.postBody)

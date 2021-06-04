@@ -13,7 +13,7 @@ import com.example.mt2android.api.Comment
 class CommentsRecyclerAdapter (private val list: List<Comment>): RecyclerView.Adapter<CommentsRecyclerAdapter.RecyclerViewHolder>() {
 
 
-    class RecyclerViewHolder(item: View) : RecyclerView.ViewHolder(item) {
+    class RecyclerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         val commentName: TextView = itemView.findViewById(R.id.commentName)
         val commentEmail: TextView = itemView.findViewById(R.id.commentEmail)
