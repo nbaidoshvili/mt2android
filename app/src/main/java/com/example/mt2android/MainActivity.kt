@@ -31,6 +31,9 @@ class MainActivity : AppCompatActivity() {
         refresh = findViewById(R.id.refreshPosts)
         refresh.isRefreshing = true
 
+        refresh.setOnRefreshListener {
+            getDataAPI()
+        }
 
         GlobalScope.launch(Dispatchers.IO) {
             if(App.instance.db.getPostDao().getAllPosts().isEmpty()){
@@ -41,10 +44,6 @@ class MainActivity : AppCompatActivity() {
 
                 getDataDB()
             }
-        }
-
-        refresh.setOnRefreshListener {
-            getDataAPI()
         }
     }
 
